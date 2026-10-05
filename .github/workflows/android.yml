@@ -6,6 +6,7 @@ on:
   pull_request:
     branches: [ "master" ]
   workflow_dispatch:
+
 jobs:
   build:
     if: "!startsWith(github.head_ref, 'debug') || startsWith(github.head_ref, 'debug-android')"
@@ -49,16 +50,6 @@ jobs:
     - name: Print env
       run: printenv | sort
 
-    - name: Install dependencies
-      working-directory: ${{github.workspace}}/Build
-      run: sudo make depend-ubuntu24-android
-
-    - name: Build TeamTalk library for Android
-      working-directory: ${{github.workspace}}/Build
-      run: make CMAKE_EXTRA="-G Ninja -DWEBRTC_FETCH_PATH=${{runner.workspace}}/webrtc -DCMAKE_INSTALL_PREFIX=${{runner.workspace}}/install-android" CMAKE_BUILD_EXTRA="--target install" android-all
-      env:
-        ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
-
     - name: Generate Android signing keystore
       working-directory: ${{github.workspace}}/Client/TeamTalkAndroid
       run: |
@@ -73,12 +64,6 @@ jobs:
     - name: Build TeamTalk Android client
       working-directory: ${{github.workspace}}/Client/TeamTalkAndroid
       run: ./gradlew build
-
-    - name: Upload TeamTalk SDK artifact
-      uses: actions/upload-artifact@v7
-      with:
-        name: teamtalksdk-android
-        path: ${{runner.workspace}}/install-android
 
     - name: Upload TeamTalk Android APK artifact
       uses: actions/upload-artifact@v7
