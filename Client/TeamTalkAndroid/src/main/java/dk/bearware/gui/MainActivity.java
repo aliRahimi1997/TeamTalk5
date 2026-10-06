@@ -2531,7 +2531,7 @@ private EditText newmsg;
                 }
                 if (ptt_vibrate) {
                     Vibrator vibrat = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-                    vibrat.vibrate(pattern = new long[] { 0, 20, 80, 20 }, -1);
+vibrat.vibrate(new long[] { 0, 20, 80, 20 }, -1);
                 }
             }
         }
