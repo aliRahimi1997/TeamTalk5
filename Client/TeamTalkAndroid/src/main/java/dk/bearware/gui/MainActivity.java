@@ -320,6 +320,7 @@ extends AppCompatActivity
                 boolean instantExit = prefs.get("pref_back_button_instant_exit", false);
 
                 if (instantExit) {
+            setCurrentChannel(null);
                     finish();
                 } else {
                     handleBackNavigation();
