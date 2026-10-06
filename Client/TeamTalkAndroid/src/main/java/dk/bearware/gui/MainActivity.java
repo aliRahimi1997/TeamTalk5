@@ -315,7 +315,15 @@ extends AppCompatActivity
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                handleBackNavigation();
+                // Check user preference: if enabled, exit server immediately instead of
+                // navigating up the channel tree (legacy behavior)
+                boolean instantExit = prefs.get("pref_back_button_instant_exit", false);
+
+                if (instantExit) {
+                    finish();
+                } else {
+                    handleBackNavigation();
+                }
             }
         });
     }
@@ -2523,8 +2531,7 @@ private EditText newmsg;
                 }
                 if (ptt_vibrate) {
                     Vibrator vibrat = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-                    long[] pattern = { 0, 20, 80, 20 };
-                    vibrat.vibrate(pattern, -1);
+                    vibrat.vibrate(pattern = new long[] { 0, 20, 80, 20 }, -1);
                 }
             }
         }

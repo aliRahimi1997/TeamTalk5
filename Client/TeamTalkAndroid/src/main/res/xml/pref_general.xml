@@ -59,5 +59,10 @@
 		android:defaultValue="true"
 		android:title="@string/pref_show_log_messages" />
 
+    <CheckBoxPreference
+		android:key="pref_back_button_instant_exit"
+		android:defaultValue="false"
+		android:title="@string/pref_title_back_button_instant_exit"
+		android:summary="@string/pref_summary_back_button_instant_exit" />
 
 </PreferenceScreen>

@@ -48,6 +48,8 @@
     <string name="pref_title_keep_screen_on">Keep screen on when connected</string>
     <string name="pref_title_vibrate">Vibrate on PTT</string>
     <string name="pref_show_log_messages">Show log messages in chat history</string>
+<string name="pref_title_back_button_instant_exit">Instant Server Exit</string>
+<string name="pref_summary_back_button_instant_exit">Disconnect from server instead of navigating up.</string>
     <string name="pref_title_audio_icons">Sound Events</string>
     <string name="pref_title_rx_tx_audio_icon">Voice transmission toggle</string>
     <string name="pref_summary_rx_tx_audio_icon">Play sound when the TX button is pressed</string>
