@@ -312,22 +312,34 @@ extends AppCompatActivity
             mMediaPlayer.setOnCompletionListener(mediaPlayer -> mMediaPlayer.release());
             mMediaPlayer.start();
         }
-        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                // Check user preference: if enabled, exit server immediately instead of
-                // navigating up the channel tree (legacy behavior)
-                boolean instantExit = prefs.get("pref_back_button_instant_exit", false);
 
-                if (instantExit) {
-            setCurrentChannel(null);
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+    @Override
+    public void handleOnBackPressed() {
+        // Check user preference: if enabled, exit server immediately instead of
+        // navigating up the channel tree (legacy behavior)
+        boolean instantExit = prefs.get("pref_back_button_instant_exit", false);
+
+        if (instantExit) {
+            if (filesAdapter.getActiveTransfersCount() > 0) {
+                AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
+                alert.setMessage(R.string.disconnect_alert);
+                alert.setPositiveButton(android.R.string.ok, (dialog, whichButton) -> {
+                    filesAdapter.cancelAllTransfers();
+                    setCurrentChannel(null);
                     finish();
-                } else {
-                    handleBackNavigation();
-                }
+                });
+                alert.setNegativeButton(android.R.string.cancel, null);
+                alert.show();
+            } else {
+                setCurrentChannel(null);
+                finish();
             }
-        });
+        } else {
+            handleBackNavigation();
+        }
     }
+});
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
