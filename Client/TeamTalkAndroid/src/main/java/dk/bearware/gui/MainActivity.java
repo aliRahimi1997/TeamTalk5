@@ -314,32 +314,50 @@ extends AppCompatActivity
         }
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
-    @Override
-    public void handleOnBackPressed() {
-        // Check user preference: if enabled, exit server immediately instead of
-        // navigating up the channel tree (legacy behavior)
-        boolean instantExit = prefs.get("pref_back_button_instant_exit", false);
+            @Override
+            public void handleOnBackPressed() {
+                // Check user preference: if enabled, exit server immediately instead of
+                // navigating up the channel tree (legacy behavior)
+                boolean instantExit = prefs.get("pref_back_button_instant_exit", false);
 
-        if (instantExit) {
-            if (filesAdapter.getActiveTransfersCount() > 0) {
-                AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
-                alert.setMessage(R.string.disconnect_alert);
-                alert.setPositiveButton(android.R.string.ok, (dialog, whichButton) -> {
-                    filesAdapter.cancelAllTransfers();
-                    setCurrentChannel(null);
-                    finish();
-                });
-                alert.setNegativeButton(android.R.string.cancel, null);
-                alert.show();
-            } else {
-                setCurrentChannel(null);
-                finish();
-            }
-        } else {
-            handleBackNavigation();
+                // Make sure we switch to the CHANNELS tab first
+                if (mViewPager.getCurrentItem() != SectionsPagerAdapter.CHANNELS_PAGE) {
+                    mViewPager.setCurrentItem(SectionsPagerAdapter.CHANNELS_PAGE);
+                    return;
+                }
+
+                if (instantExit) {
+                    if (filesAdapter.getActiveTransfersCount() > 0) {
+                        AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
+                        alert.setMessage(R.string.disconnect_alert);
+                        alert.setPositiveButton(android.R.string.ok, (dialog, whichButton) -> {
+                            filesAdapter.cancelAllTransfers();
+                            safeExit();
+                        });
+                        alert.setNegativeButton(android.R.string.cancel, null);
+                        alert.show();
+                    } else {
+                        safeExit();
+                    }
+                } else {
+                    handleBackNavigation();
                 }
             }
+
+            private void safeExit() {
+                if (getClient() != null && getClient().getMyChannelID() > 0) {
+                    getClient().doLeaveChannel();
+                }
+                
+                setCurrentChannel(null);
+                if (channelsAdapter != null) {
+                    channelsAdapter.notifyDataSetChanged();
+                }
+                
+                finish();
+            }
         });
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
