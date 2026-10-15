@@ -316,15 +316,7 @@ extends AppCompatActivity
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                // Check user preference: if enabled, exit server immediately instead of
-                // navigating up the channel tree (legacy behavior)
                 boolean instantExit = prefs.get("pref_back_button_instant_exit", false);
-
-                // Make sure we switch to the CHANNELS tab first
-                if (mViewPager.getCurrentItem() != SectionsPagerAdapter.CHANNELS_PAGE) {
-                    mViewPager.setCurrentItem(SectionsPagerAdapter.CHANNELS_PAGE);
-                    return;
-                }
 
                 if (instantExit) {
                     if (filesAdapter.getActiveTransfersCount() > 0) {
@@ -340,6 +332,10 @@ extends AppCompatActivity
                         safeExit();
                     }
                 } else {
+                    if (mViewPager.getCurrentItem() != SectionsPagerAdapter.CHANNELS_PAGE) {
+                        mViewPager.setCurrentItem(SectionsPagerAdapter.CHANNELS_PAGE);
+                        return;
+                    }
                     handleBackNavigation();
                 }
             }
