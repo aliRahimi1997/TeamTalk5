@@ -549,4 +549,6 @@
     <string name="online_user_info_ip">IPAddress</string>
     <string name="online_user_info_client">Client</string>
     <string name="text_copy">Copy</string>
+<string name="pref_title_sound_app_open">Application open sound</string>
+<string name="pref_summary_sound_app_open">Play a sound when the application opens</string>
 </resources>

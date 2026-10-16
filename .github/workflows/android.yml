@@ -50,20 +50,21 @@ jobs:
     - name: Print env
       run: printenv | sort
 
-    - name: Generate Android signing keystore
+    - name: Decode Keystore
+      uses: timheuer/base64-to-file@v2.0.0
+      id: android_keystore
+      with:
+        fileName: "teamtalk.keystore"
+        encodedString: ${{ secrets.KEYSTORE_BASE64 }}
+
+    - name: Build and Sign TeamTalk Android APK
       working-directory: ${{github.workspace}}/Client/TeamTalkAndroid
       run: |
-        keytool -genkeypair -v -keystore key.keystore -alias key -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=TeamTalk, OU=CI, O=TeamTalk, L=CI, ST=CI, C=US"
-        cat > keystore.properties <<EOF
-        storeFile=key.keystore
-        storePassword=android
-        keyAlias=key
-        keyPassword=android
-        EOF
-
-    - name: Build TeamTalk Android client
-      working-directory: ${{github.workspace}}/Client/TeamTalkAndroid
-      run: ./gradlew build
+        ./gradlew assembleRelease \
+          -Pandroid.injected.signing.store.file=${{ steps.android_keystore.outputs.filePath }} \
+          -Pandroid.injected.signing.store.password=${{ secrets.KEYSTORE_PASSWORD }} \
+          -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} \
+          -Pandroid.injected.signing.key.password=${{ secrets.KEY_PASSWORD }}
 
     - name: Upload TeamTalk Android APK artifact
       uses: actions/upload-artifact@v7

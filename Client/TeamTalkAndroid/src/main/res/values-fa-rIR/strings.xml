@@ -548,4 +548,6 @@
     <string name="online_user_info_ip">آدرس آیْپی</string>
     <string name="online_user_info_client">نام کلاینت</string>
     <string name="text_copy">کپی</string>
+<string name="pref_title_sound_app_open">صدای باز شدن برنامه</string>
+<string name="pref_summary_sound_app_open">پخش صدا هنگام باز شدن برنامه</string>
 </resources>

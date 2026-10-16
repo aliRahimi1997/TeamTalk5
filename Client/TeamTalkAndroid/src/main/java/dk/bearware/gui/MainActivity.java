@@ -237,7 +237,8 @@ extends AppCompatActivity
               SOUND_INTERCEPTON = 18,
               SOUND_INTERCEPTOFF = 19,
               SOUND_TYPING = 20,
-              SOUND_CHANMSGSENT = 21;
+              SOUND_CHANMSGSENT = 21,
+              SOUND_APP_OPEN = 22;
     
     SparseIntArray sounds = new SparseIntArray();
 
@@ -688,6 +689,9 @@ extends AppCompatActivity
         }
         if (prefs.get("userloggedoff_icon", true)) {
             sounds.put(SOUND_USERLOGGEDOFF, audioIcons.load(ctx, R.raw.logged_off, 1));
+        }
+        if (prefs.get("pref_sound_app_open", true)) {
+            sounds.put(SOUND_APP_OPEN, audioIcons.load(ctx, R.raw.vox_disable, 1));
         }
 
         getTextMessagesAdapter().showLogMessages(prefs.get("show_log_messages", true));
@@ -2106,6 +2110,12 @@ private EditText newmsg;
     @Override
     public void onServiceConnected(TeamTalkService service) {
         initializeTeamTalkService(service);
+        if (!restarting) {
+            int soundId = sounds.get(SOUND_APP_OPEN);
+            if (soundId != 0 && audioIcons != null) {
+                audioIcons.play(soundId, 1.0f, 1.0f, 0, 0, 1.0f);
+            }
+        }
     }
 
     @Override

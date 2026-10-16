@@ -97,5 +97,11 @@
         android:title="@string/pref_title_userloggedoff_icon"
         android:summary="@string/pref_summary_userloggedoff_icon"
         />
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="pref_sound_app_open"
+        android:title="@string/pref_title_sound_app_open"
+        android:summary="@string/pref_summary_sound_app_open"
+        />
 
 </PreferenceScreen>
