@@ -2062,7 +2062,7 @@ private EditText newmsg;
         service.getEventHandler().registerOnCmdChannelRemove(this, true);
         service.getEventHandler().registerOnCmdFileNew(this, true);
         service.getEventHandler().registerOnCmdFileRemove(this, true);
-        service.getEventHandler().registerOnRegisterOnUserStateChange(this, true);
+        service.getEventHandler().registerOnUserStateChange(this, true);
         service.getEventHandler().registerOnVoiceActivation(this, true);
 
         service.setOnVoiceTransmissionToggleListener(this);
