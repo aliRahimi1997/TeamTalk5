@@ -210,6 +210,7 @@ extends AppCompatActivity
     NotificationManager notificationManager;
     WakeLock wakeLock, proximityWakeLock;
     boolean restarting;
+    boolean appOpenSoundPlayed = false;
     SensorManager mSensorManager;
     Sensor mSensor;
     boolean isProximitySensorRegistered = false;
@@ -281,6 +282,7 @@ extends AppCompatActivity
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
         restarting = (savedInstanceState != null);
+        appOpenSoundPlayed = restarting;
         accessibilityAssistant = new AccessibilityAssistant(this);
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -637,6 +639,18 @@ extends AppCompatActivity
 
         audioIcons = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);
 
+        final boolean shouldPlayAppOpen = !restarting
+                && !appOpenSoundPlayed
+                && prefs.get("pref_sound_app_open", true);
+        final int[] appOpenSampleId = {-1};
+
+        audioIcons.setOnLoadCompleteListener((soundPool, sampleId, status) -> {
+            if (status == 0 && shouldPlayAppOpen && sampleId == appOpenSampleId[0]) {
+                soundPool.play(sampleId, 1.0f, 1.0f, 0, 0, 1.0f);
+                appOpenSoundPlayed = true;
+            }
+        });
+
         if (prefs.get("server_lost_audio_icon", true)) {
             sounds.put(SOUND_SERVERLOST, audioIcons.load(ctx, R.raw.serverlost, 1));
         }
@@ -691,7 +705,8 @@ extends AppCompatActivity
             sounds.put(SOUND_USERLOGGEDOFF, audioIcons.load(ctx, R.raw.logged_off, 1));
         }
         if (prefs.get("pref_sound_app_open", true)) {
-            sounds.put(SOUND_APP_OPEN, audioIcons.load(ctx, R.raw.vox_disable, 1));
+            appOpenSampleId[0] = audioIcons.load(ctx, R.raw.vox_disable, 1);
+            sounds.put(SOUND_APP_OPEN, appOpenSampleId[0]);
         }
 
         getTextMessagesAdapter().showLogMessages(prefs.get("show_log_messages", true));
@@ -1557,10 +1572,6 @@ private EditText newmsg;
                     if ((flags & ClientFlag.CLIENT_CONNECTING) == ClientFlag.CLIENT_CONNECTING) {
                         con = getString(R.string.stat_connecting);
                     }
-                    else if ((flags & ClientFlag.CLIENT_AUTHORIZED) == ClientFlag.CLIENT_CLOSED) {
-                        // indicate 'offline' if not authorized
-                        con = getString(R.string.stat_unauthorized);
-                    }
                     else if ((flags & ClientFlag.CLIENT_AUTHORIZED) == ClientFlag.CLIENT_AUTHORIZED) {
                         con = getString(R.string.stat_online);
                         con_color = Color.GREEN;
@@ -2051,7 +2062,7 @@ private EditText newmsg;
         service.getEventHandler().registerOnCmdChannelRemove(this, true);
         service.getEventHandler().registerOnCmdFileNew(this, true);
         service.getEventHandler().registerOnCmdFileRemove(this, true);
-        service.getEventHandler().registerOnUserStateChange(this, true);
+        service.getEventHandler().registerOnRegisterOnUserStateChange(this, true);
         service.getEventHandler().registerOnVoiceActivation(this, true);
 
         service.setOnVoiceTransmissionToggleListener(this);
@@ -2110,12 +2121,6 @@ private EditText newmsg;
     @Override
     public void onServiceConnected(TeamTalkService service) {
         initializeTeamTalkService(service);
-        if (!restarting) {
-            int soundId = sounds.get(SOUND_APP_OPEN);
-            if (soundId != 0 && audioIcons != null) {
-                audioIcons.play(soundId, 1.0f, 1.0f, 0, 0, 1.0f);
-            }
-        }
     }
 
     @Override
